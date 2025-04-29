@@ -1,24 +1,26 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;
-
-int main(){
-    string n;
-    int freq[10]={0, }, max=0, len,num,sum;
-    cin>>n;
-    len = n.length();
-    num=stoi(n);
-
-    for (int i =0 ;i<len;i++){
-        freq[num%10]++;
-        num /=10;
+int main() {
+  int num;
+  int max = 0;
+  vector<int> v1(10);
+  cin >> num;
+  while(num>0) {
+    int x = num % 10;
+    if(x == 9) {
+      v1[6]++;
+    } else {
+      v1[x]++;
     }
-    sum=freq[6]+freq[9];
-    freq[6] = ceil((double)sum/2);
-    freq[9] = ceil((double)sum/2);
-
-    for (int i=0;i<10;i++){
-        if(max<freq[i]) max = freq[i];
+    num/=10;
+  }
+  for(int i=0; i<v1.size(); i++){
+    if(i==6) {
+      if(max < (v1[i]+1)/2) max = (v1[i]+1)/2;
+    } else {
+      if(max < v1[i]) max = v1[i];
     }
-    cout << max;
-    return 0;
+  }
+  cout << max;
 }
