@@ -1,44 +1,28 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <list>
+
 using namespace std;
 
-int main(void) {
-    string word;
-    char cmd, c;
-    int m,len;
-    list<char> L;
-    cin >> word ;
-    len = word.length();
-    for (int i=0; i<len; i++) {
-        L.push_back(word[i]);
+int main() {
+  string str,com;
+  int n,len=0;
+  list<char> list;
+  cin >> str >> n;
+  cin.ignore();
+  for(auto k : str) list.push_back(k);
+  auto t = list.end();
+  for(int i=0; i<n; i++){
+    getline(cin,com);
+    if(com[0]=='P'){
+      list.insert(t,com[2]);
+    } else if (com[0]=='L' && t!=list.begin()){
+      t--;
+    } else if (com[0]=='D' && t != list.end()){
+      t++;
+    } else if (com[0]=='B' && t != list.begin()) {
+      t--;
+      t = list.erase(t);
     }
-    auto t = L.end();
-    cin >> m;
-
-    for(int i=0;i<m;i++){
-        cin >> cmd;
-        if (cmd == 'L') {
-            if (t != L.begin()) t--;
-        }
-        else if (cmd == 'D') {
-            if (t != L.end()) t++;
-        }
-        else if (cmd == 'B') {
-            if(t!=L.begin()) {
-                t--;
-                t=L.erase(t);
-                len--;
-                }
-        }
-        else {
-            cin >> c;
-            L.insert(t, c);
-            len++;
-        }
-    }
-    t=L.begin();
-    for(int i=0;i<len;i++) {
-        cout << *t;
-        t++;
-    }
-    return 0;
+  }
+  for(auto k : list) cout << k;
 }
