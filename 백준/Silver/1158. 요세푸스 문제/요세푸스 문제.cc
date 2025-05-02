@@ -1,47 +1,27 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <list>
+
 using namespace std;
 
-int main(void)
-{
-  ios::sync_with_stdio(0);
-  cin.tie(0);
-
-  int n, k, idx = 0;
-  int arr[5001] = {
-      0,
-  };
+int main(){
+  int n,k;
   cin >> n >> k;
-  list<int> L;
-  for (int i = 1; i <= n; i++)
-    L.push_back(i);
-  auto p = L.begin();
-  while (1)
-  {
-    for (int i = 0; i < k; i++)
-    {
-      if (p != L.end())
-        p++;
-      else
-      {
-        p = L.begin();
-        p++;
-      }
-    }
-    p--;
-    arr[idx] = *p;
-    p = L.erase(p);
-    idx++;
-    if (L.begin() == L.end())
-      break;
-  }
+  list<int> list;
+  for(int i=1; i<=n; i++) list.push_back(i);
+  auto t = list.begin();
   cout << "<";
-  for (int i = 0; i < n; i++)
-  {
-    cout << arr[i];
-    if (i != n - 1)
-      cout << ", ";
-    else
-      cout << ">";
+  while(!list.empty()){
+    for(int i=0; i<k; i++){
+      if(i==0) continue;
+      if(t != list.end()){
+        t++;
+        if(t==list.end()) t=list.begin();
+      }
+    }  
+    cout << *t;
+    if(list.size() > 1) cout << ", ";
+    t = list.erase(t);
+    if(t==list.end()) t=list.begin();
   }
-  return 0;
+  cout << ">";
 }
