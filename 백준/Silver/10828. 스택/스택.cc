@@ -1,64 +1,33 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <stack>
+
 using namespace std;
 
-const int MX = 1000005;
-int dat[MX];
-int pos = 0;
-
-void push(int x)
-{
-  dat[pos] = x;
-  pos++;
-}
-
-void pop()
-{
-  if (pos != 0)
-  {
-    pos--;
-    cout << dat[pos] << "\n";
-  }
-  else
-    cout << -1 << "\n";
-}
-
-int top()
-{
-  if (pos != 0)
-  {
-    return dat[pos - 1];
-  }
-  else return -1;
-}
-
-void size()
-{
-  cout << pos << "\n";
-}
-
-void empty()
-{
-  if (pos == 0)
-    cout << 1 << "\n";
-  else
-    cout << 0 << "\n";
-}
-
-
-int main(void)
-{
-  int n,num;
-  string cmd;
+int main(){
+  int n;
   cin >> n;
-  for (int i = 0; i < n; i++){
-    cin >> cmd;
-    if (cmd == "push") {
+  stack<int> s;
+  while(n--){
+    string com;
+    cin >> com;
+    if(com=="push"){
+      int num;
       cin >> num;
-      push(num);
+      s.push(num);
+    } else if(com=="pop"){
+      if(s.empty()) cout << -1 << "\n";
+      else {
+        cout << s.top() << "\n";
+        s.pop();
+      }
+    } else if(com=="size"){
+      cout << s.size() << "\n";
+    } else if(com=="empty"){
+      if(s.empty()) cout << 1 << "\n";
+      else cout << 0 << "\n";
+    } else{
+      if(s.empty()) cout << -1 << "\n";
+      else cout << s.top() << "\n";
     }
-    else if (cmd == "pop") pop();
-    else if (cmd == "size") size();
-    else if (cmd == "empty") empty();
-    else cout << top()<<"\n";
   }
 }
