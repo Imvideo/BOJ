@@ -1,41 +1,44 @@
-#include <bits/stdc++.h>
-using namespace std;
+#include <iostream>
+#include <queue>
 
-int main(void)
-{
+using namespace std;
+int n;
+int main(){
   ios::sync_with_stdio(0);
   cin.tie(0);
-  queue<int> q;
-  int n,num;
-  string op;
   cin >> n;
-  for (int i = 0; i < n; i++){
-    cin >> op;
-    if (op == "push") {
+  queue<int> q;
+  while(n--){
+    string word;
+    cin >> word;
+    if(word == "push"){
+      int num;
       cin >> num;
       q.push(num);
     }
-    else if (op == "pop") {
-      if (q.empty()) cout << -1 << "\n";
-      else {
-        num = q.front();
+    else if(word == "pop"){
+      if(q.empty()) cout << -1;
+      else{
+        cout << q.front();
         q.pop();
-        cout << num << "\n";
       }
+      cout << "\n";
     }
-    else if (op == "size") cout << q.size() << "\n";
-    else if ( op == "empty") {
-      if (q.empty()) cout << 1 << "\n";
-      else cout << 0 << "\n";
+    else if(word == "size") cout << q.size() << "\n";
+    else if(word == "empty"){
+      if(q.empty()) cout << 1;
+      else cout << 0;
+      cout << "\n";
     }
-    else if (op == "front") {
-      if (q.empty()) cout << -1 << "\n";
-      else cout << q.front() << "\n";
+    else if(word == "front"){
+      if(q.empty()) cout << -1;
+      else cout << q.front();
+      cout << "\n";
     }
-    else {
-      if (q.empty()) cout << -1 << "\n";
-      else cout << q.back() << "\n";
+    else{
+      if(q.empty()) cout << -1;
+      else cout << q.back();
+      cout << "\n";
     }
   }
-  
 }
