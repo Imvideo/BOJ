@@ -1,66 +1,70 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <deque>
+#include <sstream>
+#include <algorithm>
+
 using namespace std;
 
-void parse(string& tmp, deque<int>& d){
-  int cur = 0;
-  for(int i = 1; i+1 < tmp.size(); i++)
-  {
-    if(tmp[i] == ','){
-      d.push_back(cur);
-      cur = 0;
-    }
-    else{
-      cur = 10 * cur + (tmp[i] - '0');
-    }
-  }
-  if(cur != 0)
-    d.push_back(cur);
-}
+deque<int> dq;
+int t,n,num;
+string p;
 
-void print_result(deque<int>& d){
-  cout << '[';
-  for(int i = 0; i < d.size(); i++)
-  {
-    cout << d[i];
-    if(i+1 != d.size())
-      cout << ',';
-  }
-  cout << "]\n";
-}
-
-int t;
 int main(){
-  ios::sync_with_stdio(0);
-  cin.tie(0);
-  cin >> t;
-  while(t--){
-    deque<int> d;
-    int rev = 0;
-    int n;
-    bool isWrong = false;
-    string query, tmp;
-    cin >> query;
-    cin >> n;
-    cin >> tmp;
-    parse(tmp, d);
-    for(char c : query)
-    {
-      if(c == 'R')
-        rev = 1 - rev;
-      else{
-        if(d.empty()){
-          isWrong = true;
-          break;
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cin >> t;
+    while(t--){
+        bool flag = false;
+        dq.clear();
+        string str;
+        int cur=0;
+        cin >> p >> n >> str;
+
+        for(int i=1; i+1<str.length(); i++){
+            if(str[i]==','){
+                dq.push_back(cur);
+                cur=0;
+            }
+            else{
+                cur = cur * 10 + str[i]-'0';
+            }
         }
-        if(!rev) d.pop_front();
-        else d.pop_back();
-      }
+        if(cur != 0){
+            dq.push_back(cur);
+        }
+
+        int rev = 0;
+        for(int i=0; i<p.length(); i++){
+            if(p[i]=='R') {
+                rev = 1-rev;
+            }
+            else{
+                if(dq.empty()){
+                    flag=true;
+                    break;
+                }
+                else{
+                    if(!rev) dq.pop_front();
+                    else dq.pop_back();
+                }
+            }
+        }
+        if(flag){
+            cout << "error\n";
+            continue;
+        }
+        if(rev) reverse(dq.begin(), dq.end());
+        cout << "[";
+        while(!dq.empty()){
+            if(dq.size()==1){
+                cout << dq.front();
+                break;
+            }
+            else{
+                cout << dq.front() << ",";
+                dq.pop_front();
+            }
+        }
+        cout << "]\n";
     }
-    if(isWrong)
-      cout << "error\n";
-    else{
-      if(rev) reverse(d.begin(), d.end());
-      print_result(d);
-    }
-  }
 }
