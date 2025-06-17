@@ -2,90 +2,98 @@ import java.io.*;
 import java.util.*;
 
 public class Main{
-    static class Node{
-        int n,m,k;
-        public Node(int n,int m,int k){
-            this.n = n;
-            this.m = m;
+    static class Tuple{
+        int h,w,k;
+        public Tuple(int h, int w, int k){
+            this.h = h;
+            this.w = w;
             this.k = k;
         }
     }
-    static void move(int n, int m, int k){
-        
-    }
-    public static void main(String[] args) throws IOException {
+
+    static int k,w,h;
+    static int[][] board = new int[202][202];
+    static int[][][] vis = new int[32][202][202];
+    static int[] dxH = {1,2,2,1,-1,-2,-2,-1};
+    static int[] dyH = {2,1,-1,-2,-2,-1,1,2};
+    static int[] dxM = {1,0,-1,0};
+    static int[] dyM = {0,1,0,-1};
+    public static void main(String[] args) throws IOException{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-        Queue<Node> queue = new LinkedList<Node>();
-        int[] dhx = {2,1,-1,-2,-2,-1,1,2};
-        int[] dhy = {1,2,2,1,-1,-2,-2,-1};
-        int[] dmx = {1,0,-1,0};
-        int[] dmy = {0,1,0,-1};
-        int[][][] vis = new int[32][202][202];
-        int Kn = Integer.parseInt(br.readLine());
+        k = Integer.parseInt(br.readLine());
         StringTokenizer st = new StringTokenizer(br.readLine());
-        int m = Integer.parseInt(st.nextToken());
-        int n = Integer.parseInt(st.nextToken());
-        int[][] board = new int[n][m];
-
-        for(int i=0; i<32; i++){
-            for(int j=0; j<202; j++){
-                Arrays.fill(vis[i][j], 0);
+        w = Integer.parseInt(st.nextToken());
+        h = Integer.parseInt(st.nextToken());
+        for(int z=0; z<=k; z++){
+            for(int i=0; i<h; i++){
+                Arrays.fill(vis[z][i], -1);
             }
         }
 
-        //맵 입력
-        for(int i=0; i<n; i++){
+        for(int i=0; i<h; i++){
             st = new StringTokenizer(br.readLine());
-            for(int j=0; j<m; j++){
+            for(int j=0; j<w; j++){
                 board[i][j] = Integer.parseInt(st.nextToken());
             }
         }
-        queue.add(new Node(0,0,0));
-        vis[0][0][0] = 1;
-        while (!queue.isEmpty()) {
-            int vk, vx, vy;
-            Node node = queue.poll();
-            vk = node.k;
-            vx = node.n;
-            vy = node.m;
-            // 말 이동
-            if ( vk < Kn) {
-                for (int dir = 0; dir < 8; dir++) {
-                    int nx = vx + dhx[dir];
-                    int ny = vy + dhy[dir];
-                    if (nx < 0 || nx >= n || ny < 0 || ny >= m)
-                        continue;
-                    if (board[nx][ny] == 1)
-                        continue;
-                    if(vis[vk+1][nx][ny] > 0) continue;
-                    vis[vk+1][nx][ny] = vis[vk][vx][vy] + 1;
-                    queue.add(new Node(nx,ny,vk+1));
+
+        Deque<Tuple> dq = new LinkedList<Tuple>();
+        dq.addFirst(new Tuple(0,0,0));
+        vis[0][0][0] = 0;
+        boolean found = false;
+        if (w == 1 && h == 1) {
+            found = true;
+            bw.write(0+"\n");
+        }
+        while(!dq.isEmpty() && !found){
+            Tuple cur = dq.poll();
+            if(cur.k < k){
+                for(int dir=0; dir<8; dir++){
+                    int nx = cur.h + dxH[dir];
+                    int ny = cur.w + dyH[dir];
+                    int nk = cur.k + 1;
+                    if(nx < 0 || nx >= h || ny < 0 || ny >= w) continue;
+                    if(vis[nk][nx][ny] > -1 || board[nx][ny] == 1) continue;
+                    vis[nk][nx][ny] = vis[cur.k][cur.h][cur.w] + 1;
+                    if(nx == h-1 && ny == w-1){
+                        found = true;
+                        bw.write(vis[nk][nx][ny]+"\n");
+                        break;
+                    }
+                    dq.addLast(new Tuple(nx, ny, nk));
                 }
             }
-            // 원숭이 이동
-            for (int dir = 0; dir < 4; dir++) {
-                int nx = vx + dmx[dir];
-                int ny = vy + dmy[dir];
-                if (nx < 0 || nx >= n || ny < 0 || ny >= m)
-                    continue;
-                if (board[nx][ny] == 1)
-                    continue;
-                if(vis[vk][nx][ny] > 0) continue;
-                vis[vk][nx][ny] = vis[vk][vx][vy] + 1;
-                queue.add(new Node(nx,ny,vk));
+            for(int dir=0; dir<4; dir++){
+                int nx = cur.h + dxM[dir];
+                int ny = cur.w + dyM[dir];
+                int nk = cur.k;
+                if(nx < 0 || nx >= h || ny < 0 || ny >= w) continue;
+                if(vis[nk][nx][ny] > -1 || board[nx][ny] == 1) continue;
+                vis[nk][nx][ny] = vis[cur.k][cur.h][cur.w] + 1;
+                if(nx == h-1 && ny == w-1){
+                    found = true;
+                    bw.write(vis[nk][nx][ny]+"\n");
+                    break;
+                }
+                dq.addLast(new Tuple(nx, ny, nk));
             }
         }
-        int ans = Integer.MAX_VALUE;
-        for(int i=0; i<Kn + 1; i++){
-            if(vis[i][n-1][m-1] > 0){
-                ans = Math.min(ans, vis[i][n-1][m-1]);
-            }
-        }
-        if(ans != Integer.MAX_VALUE) bw.write(ans-1+"");
-        else bw.write(-1+"");
+        
+        // for(int z=0; z<=k; z++){
+        //     for(int i=0; i<h; i++){
+        //         for(int j=0; j<w; j++){
+        //             bw.write(vis[z][i][j] + " ");
+        //         }
+        //         bw.write("\n");
+        //     }
+        //     bw.write("\n");
+        // }
+
+        if(!found) bw.write(-1+"\n");
         bw.flush();
         bw.close();
+        
     }
 }
