@@ -3,71 +3,60 @@ import java.util.*;
 import java.awt.Point;
 
 public class Main {
+    static int dx[] = {1,0,-1,0};
+    static int dy[] = {0,1,0,-1};
+    static int board[][] = new int[1002][1002];
+    static boolean visited[][] = new boolean[1002][1002];
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        int n, m;
-        int num = 0;
-        int ans=0;
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        m = Integer.parseInt(st.nextToken());
-        n = Integer.parseInt(st.nextToken());
-        Queue<Point> queue = new LinkedList<Point>();
-        int[][] map = new int[n][m];
-        int[][] check = new int[n][m];
-        int[] dx = { 1, 0, -1, 0 };
-        int[] dy = { 0, 1, 0, -1 };
-
-        //토마토 밭 입력
-        for (int i = 0; i < n; i++) {
-            st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < m; j++) {
-                map[i][j] = Integer.parseInt(st.nextToken());
-            }
-        }
-
-        //거리 확인용 배열 초기화
-        for (int i = 0; i < n; i++) {
-            Arrays.fill(check[i], -1);
-        }
-
-        //익은 토마토 미리 큐에 넣기
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < m; j++) {
-                if(map[i][j] == 1){
-                    queue.add(new Point(i,j));
-                    check[i][j] = 0;
-                }
-            }   
-        }
         
-        //큐 돌리기
-        while (!queue.isEmpty()) {
-            Point point = queue.poll();
-            num = check[point.x][point.y] + 1;
-            for (int dir = 0; dir < 4; dir++) {
-                int nx = point.x + dx[dir];
-                int ny = point.y + dy[dir];
-                if (nx < 0 || nx >= n || ny < 0 || ny >= m)
-                    continue;
-                if (check[nx][ny] != -1 || map[nx][ny] == -1)
-                    continue;
-                check[nx][ny] = num;
-                queue.add(new Point(nx, ny));
-                ans = Math.max(ans,check[nx][ny]);
+        int m, n;
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        n = Integer.parseInt(st.nextToken());
+        m = Integer.parseInt(st.nextToken());
+        Queue<Point> q = new LinkedList<>();
+        for(int i=0; i<m; i++){
+            st = new StringTokenizer(br.readLine());
+            for(int j=0; j<n; j++){
+                int num = Integer.parseInt(st.nextToken());
+                board[i][j] = num;
+                if(num == 1){
+                    q.add(new Point(i,j));
+                    visited[i][j] = true;
+                }
             }
         }
+        while(!q.isEmpty()){
+            Point cur = q.poll();
+            for(int d=0; d<4; d++){
+                int nx = cur.x + dx[d];
+                int ny = cur.y + dy[d];
+                if(nx < 0 || nx >= m || ny < 0 || ny >= n) continue;
+                if(visited[nx][ny] || board[nx][ny] != 0) continue;
+                visited[nx][ny] = true; board[nx][ny] = board[cur.x][cur.y] + 1;
+                q.add(new Point(nx,ny));
 
-        //익지 않은 토마토 확인
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < m; j++) {
-                if(check[i][j] == -1 && map[i][j] == 0){
-                    ans = -1;
+            }
+        }
+        int mx = 0; boolean flag = false;
+        for(int i=0; i<m; i++){
+            for(int j=0; j<n; j++){
+                if(board[i][j] == 0){
+                    flag = true;
+                    break;
                 }
-            }   
+                mx = Math.max(mx, board[i][j]);
+            }
+            if(flag) break;
+        }
+        if(flag){
+            bw.write(-1+"");
+        }
+        else{
+            bw.write(mx-1+"");
         }
 
-        bw.write(ans + "");
         bw.flush();
         bw.close();
     }
