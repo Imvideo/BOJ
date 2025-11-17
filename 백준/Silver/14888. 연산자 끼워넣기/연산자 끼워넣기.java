@@ -3,43 +3,44 @@ import java.util.*;
 import java.awt.Point;
 
 public class Main {
-    static int n, ans, mx=-1000000001, mn=1000000001;
-    static int num[] = new int[13];
-    static int cal[] = new int[4];
-    static int calOrder[] = new int[13];
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+    
+    static int n, mx = -1000000001, mn = 1000000001, opCnt = 0;
+    static int[] arr = new int[12];
+    static int[] op = new int[4];
 
-    static void func(int ans, int k){
-        if(k==n){
-            mx = Math.max(ans,mx);
-            mn = Math.min(ans,mn);
+    static void func(int k, int sum){
+        if(k == n-1){
+            mx = Math.max(mx, sum);
+            mn = Math.min(mn, sum);
             return;
         }
-        for(int i=0; i<4; i++){
-            if(cal[i] <= 0) continue;
-            cal[i]--;
-            if(i==0) func(ans+num[k],k+1);
-            else if(i==1) func(ans-num[k],k+1);
-            else if(i==2) func(ans*num[k],k+1);
-            else if(i==3) func(ans/num[k],k+1);
-            cal[i]++;
+        for(int i=0; i< 4; i++){
+            if(op[i] > 0){
+                op[i]--;
+                if(i == 0) func(k+1, sum + arr[k+1]);
+                else if(i == 1) func(k+1, sum - arr[k+1]);
+                else if(i == 2) func(k+1, sum * arr[k+1]);
+                else if(i == 3) func(k+1, sum / arr[k+1]);
+                op[i]++;
+            }
         }
-        
     }
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-
         n = Integer.parseInt(br.readLine());
         StringTokenizer st = new StringTokenizer(br.readLine());
         for(int i=0; i<n; i++){
-            num[i] = Integer.parseInt(st.nextToken());
+            int num = Integer.parseInt(st.nextToken());
+            arr[i] = num;
         }
         st = new StringTokenizer(br.readLine());
         for(int i=0; i<4; i++){
-            cal[i] = Integer.parseInt(st.nextToken());
+            op[i] = Integer.parseInt(st.nextToken());
+            opCnt += op[i];
         }
-        func(num[0], 1);
-        bw.write(mx+"\n"+mn);
+        func(0, arr[0]);
+        bw.write(mx + "\n" + mn);
         bw.flush();
         bw.close();
     }
