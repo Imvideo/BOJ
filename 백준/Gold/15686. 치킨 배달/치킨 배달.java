@@ -2,65 +2,61 @@ import java.io.*;
 import java.util.*;
 import java.awt.Point;
 
-public class Main {
-    static int n, m, chk = 0, mn = Integer.MAX_VALUE;
-    static int[] dx = {1, 0, -1, 0};
-    static int[] dy = {0, 1, 0, -1};
-    static int[][] board;
-    static ArrayList<Point> houses = new ArrayList<>();
-    static ArrayList<Point> chickens = new ArrayList<>();
+public class Main{
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-    // BFS로 특정 집에서 가장 가까운 치킨집까지의 거리를 계산
-    static int getDistance(ArrayList<Point> selectedChickens) {
-        int totalDist = 0;
-        for (Point house : houses) {
-            int minDist = Integer.MAX_VALUE;
-            for (Point chicken : selectedChickens) {
-                int dist = Math.abs(house.x - chicken.x) + Math.abs(house.y - chicken.y);
-                minDist = Math.min(minDist, dist);
-            }
-            totalDist += minDist;
-        }
-        return totalDist;
-    }
+    static int n, m, ans = Integer.MAX_VALUE;
+    static int[][] board = new int[52][52];
+    static boolean[] chosen;
+    static ArrayList<Point> house = new ArrayList<>();
+    static ArrayList<Point> chicken = new ArrayList<>();
 
-    // 치킨집 선택 조합을 생성
-    static void comb(int start, ArrayList<Point> selected) {
-        if (selected.size() == m) {
-            mn = Math.min(mn, getDistance(selected));
+    static void dfs(int idx, int cnt){
+        if(cnt == m){
+            ans = Math.min(ans, calDist());
             return;
         }
+        if(idx == chicken.size()) return;
 
-        for (int i = start; i < chickens.size(); i++) {
-            selected.add(chickens.get(i));
-            comb(i + 1, selected);
-            selected.remove(selected.size() - 1);
-        }
+        chosen[idx] = true;
+        dfs(idx+1, cnt+1);
+
+        chosen[idx] = false;
+        dfs(idx+1, cnt);
     }
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-
+    static int calDist(){
+        int sum = 0;
+        for(Point h : house){
+            int mnDist = Integer.MAX_VALUE;
+            for(int i=0; i< chicken.size(); i++){
+                if(!chosen[i]) continue;
+                Point cur = chicken.get(i);
+                int dis = Math.abs(h.x - cur.x) + Math.abs(h.y - cur.y);
+                mnDist = Math.min(mnDist, dis);
+            }
+            sum += mnDist;
+        }
+        return sum;
+    }
+    public static void main(String args[]) throws IOException{
+        // 입력
         StringTokenizer st = new StringTokenizer(br.readLine());
         n = Integer.parseInt(st.nextToken());
         m = Integer.parseInt(st.nextToken());
-        board = new int[n][n];
-
-        // 입력받기 및 집, 치킨집 위치 저장
-        for (int i = 0; i < n; i++) {
+        for(int i=0; i<n; i++){
             st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < n; j++) {
+            for(int j=0; j<n; j++){
                 board[i][j] = Integer.parseInt(st.nextToken());
-                if (board[i][j] == 1) houses.add(new Point(i, j));  // 집
-                if (board[i][j] == 2) chickens.add(new Point(i, j)); // 치킨집
+                if(board[i][j] == 1) house.add(new Point(i, j));
+                else if(board[i][j] == 2) chicken.add(new Point(i, j));
             }
         }
+        chosen = new boolean[chicken.size()];
+        dfs(0, 0);
 
-        // 치킨집 조합을 선택하여 최소 거리 계산
-        comb(0, new ArrayList<>());
-
-        bw.write(mn + "\n");
+        bw.write(ans + "");
         bw.flush();
         bw.close();
     }
