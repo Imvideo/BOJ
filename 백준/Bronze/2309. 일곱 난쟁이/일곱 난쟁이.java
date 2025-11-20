@@ -1,49 +1,38 @@
 import java.io.*;
 import java.util.*;
-public class Main{
-    static int ans[] = new int[9];
-    static int arr[] = new int[9];
-    static boolean isused[] = new boolean[9];
+import java.awt.Point;
+
+public class Main {
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-    static void func(int k) throws IOException{
-        if(k==7){
-            int sum=0;
-            for(int i=0; i<7; i++){
-                sum+=ans[i];
-            }
-            if(sum == 100){
-                for(int i=0; i<7; i++){
-                    bw.write(ans[i]+"\n");
+
+    static boolean flag = false;
+    static int sum = 0;
+    static int[] dwarf = new int[9];
+    static boolean[] used = new boolean[9];
+    static ArrayList<Integer> ans = new ArrayList<>();
+    
+    public static void main(String args[]) throws IOException {
+        // 입력
+        for(int i=0; i<9; i++){
+            dwarf[i] = Integer.parseInt(br.readLine());
+            sum += dwarf[i];
+        }
+        Arrays.sort(dwarf);
+        for(int i=0; i<9; i++){
+            if(flag) break;
+            for(int j=i+1; j<9; j++){
+                if(sum - dwarf[i] - dwarf[j] == 100){
+                    dwarf[i] = 0; dwarf[j] = 0;
+                    flag = true;
+                    break;
                 }
-                bw.flush();
-                bw.close();
-                System.exit(0);
-            }
-            else{
-                return;
             }
         }
         for(int i=0; i<9; i++){
-            if(!isused[i]){
-                ans[k] = arr[i];
-                isused[i] = true;
-                func(k+1);
-                isused[i] = false;
-            }
-            
+            if(dwarf[i] != 0 ) bw.write(dwarf[i]+"\n");
         }
-    }
-    public static void main(String[] args) throws IOException{
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        
-        for(int i=0; i<9; i++){
-            arr[i] = Integer.parseInt(br.readLine());
-        }
-        Arrays.sort(arr);
-        func(0);
         bw.flush();
         bw.close();
-
-        
     }
 }
