@@ -6,54 +6,42 @@ public class Main {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-    static int n, m, x, y, k, r = 1, c = 1, upDix = 1, eastIdx = 3;
+    static int n, m, x, y, k;    
     static int[] dice = new int[7];
-    static int[] dx = {0,0,-1,1};
-    static int[] dy = {1,-1,0,0};
     static int[][] board = new int[22][22];
     static int[][] idx = {
         {},
-        {2,6,4,5},
-        {2,5,4,6},
-        {3,2,1,4},
-        {2,3,4,1},
+        {6,3,1,4},
+        {6,4,1,3},
+        {6,2,1,5},
+        {6,5,1,2}
     };
 
-    static void roll(int dir){
+    static void score(int d){
         int[] tmp = new int[7];
-        for(int i=1; i<=6; i++) {
-            tmp[i] = dice[i];
+        for(int i=1; i<=6; i++) tmp[i] = dice[i];
+        for(int i=0; i<4; i++){
+            tmp[idx[d][i]] = dice[idx[d][(i+1)%4]];
         }
-        for(int i=0; i<4; i++) {
-            tmp[idx[dir][i]] = dice[idx[dir][(i+1)%4]];
-        }
-        for(int i=1; i<=6; i++) {
-            dice[i] = tmp[i];
-        }
-    }
+        for(int i=1; i<=6; i++) dice[i] = tmp[i];
 
-    static void score(int d) throws IOException{
+    }
+    static void roll (int d) throws IOException{
         int nx = x, ny = y;
-        if(d==1) ++ny;
-        else if(d == 2) --ny;
-        else if(d == 3) --nx;
-        else ++nx;
+        if(d == 1) ny++;
+        else if(d == 2) ny--;
+        else if(d == 3) nx--;
+        else nx++;
 
-        if(OOB(nx,ny)) {
-            x = nx; y = ny;
-            roll(d);
-            if(board[nx][ny] == 0) board[nx][ny] = dice[4];
-            else{
-                dice[4] = board[nx][ny];
-                board[nx][ny] = 0;
-            }
-            bw.write(dice[2]+"\n");
+        if(nx < 0 || nx >= n || ny < 0 || ny >= m) return;
+        x = nx; y = ny;
+        score(d);
+        if(board[x][y] == 0) board[nx][ny] = dice[6];
+        else{
+            dice[6] = board[nx][ny];
+            board[nx][ny] = 0;
         }
-    }
-
-    static boolean OOB(int nx, int ny) {
-        if(nx < 0 || nx >= n || ny < 0 || ny >= m) return false;
-        return true;
+        bw.write(dice[1]+"\n");
     }
 
     public static void main(String[] args) throws IOException{
@@ -63,7 +51,6 @@ public class Main {
         x = Integer.parseInt(st.nextToken());
         y = Integer.parseInt(st.nextToken());
         k = Integer.parseInt(st.nextToken());
-
         for(int i=0; i<n; i++){
             st = new StringTokenizer(br.readLine());
             for(int j=0; j<m; j++){
@@ -72,8 +59,7 @@ public class Main {
         }
         st = new StringTokenizer(br.readLine());
         for(int i=0; i<k; i++){
-            int dir = Integer.parseInt(st.nextToken());
-            score(dir);
+            roll(Integer.parseInt(st.nextToken()));
         }
         bw.flush();
         bw.close();
