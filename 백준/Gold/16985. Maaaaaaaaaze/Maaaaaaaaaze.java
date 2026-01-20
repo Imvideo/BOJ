@@ -1,9 +1,11 @@
 import java.io.*;
 import java.util.*;
+import java.awt.Point;
 
 class Tuple {
     int x, y, z;
-    public Tuple(int x, int y, int z) {
+
+    Tuple(int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -11,114 +13,104 @@ class Tuple {
 }
 
 public class Main {
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-    static int[][][][] board = new int[4][5][5][5];
+
+    static int[][][][] board = new int[4][5][5][5]; // [dir][order][i][j];
     static int[][][] maze = new int[5][5][5];
-    static int[] dx = {1, 0, 0, 0, 0, -1};
-    static int[] dy = {0, 1, -1, 0, 0, 0};
-    static int[] dz = {0, 0, 0, 1, -1, 0};
+    static int[] order = new int[5];
+    static boolean[] picked = new boolean[5];
+    static int mn = 9999;
 
-    static int solve() {
-        int[][][] dist = new int[5][5][5];
-        if (maze[0][0][0] == 0 || maze[4][4][4] == 0) return 9999;
-
+    static int[] dx = {1,0,-1,0,0,0};
+    static int[] dy = {0,1,0,-1,0,0};
+    static int[] dz = {0,0,0,0,1,-1};
+    static int bfs(){
+        if(maze[0][0][0] == 0 || maze[4][4][4] == 0) return 9999;
+        int[][][] dis = new int[5][5][5];
         Queue<Tuple> q = new LinkedList<>();
         q.add(new Tuple(0, 0, 0));
-        dist[0][0][0] = 1;
-
-        while (!q.isEmpty()) {
-            Tuple tuple = q.poll();
-            for (int dir = 0; dir < 6; dir++) {
-                int x = tuple.x;
-                int y = tuple.y;
-                int z = tuple.z;
-                int nx = x + dx[dir];
-                int ny = y + dy[dir];
-                int nz = z + dz[dir];
-
-                if (0 > nx || nx >= 5 || 0 > ny || ny >= 5 || 0 > nz || nz >= 5) continue;
-                if (maze[nx][ny][nz] == 0 || dist[nx][ny][nz] != 0) continue;
-                if (nx == 4 && ny == 4 && nz == 4) return dist[x][y][z];
-                dist[nx][ny][nz] = dist[x][y][z] + 1;
+        dis[0][0][0] = 1;
+        while(!q.isEmpty()){
+            Tuple cur = q.poll();
+            for(int d=0; d<6; d++){
+                int nx = cur.x + dx[d];
+                int ny = cur.y + dy[d];
+                int nz = cur.z + dz[d];
+                if(nx < 0 || nx >= 5 || ny < 0 || ny >= 5 || nz < 0 || nz >= 5) continue;
+                if(maze[nx][ny][nz] == 0 || dis[nx][ny][nz] != 0) continue;
+                if(nx == 4 && ny == 4 && nz == 4) {
+                    return dis[cur.x][cur.y][cur.z];
+                }
+                dis[nx][ny][nz] = dis[cur.x][cur.y][cur.z] + 1;
                 q.add(new Tuple(nx, ny, nz));
             }
         }
         return 9999;
     }
-
-    static boolean nextPermutation(int[] order) {
-        int i = 4;
-        while (i > 0 && order[i - 1] >= order[i]) i--;
-        if (i == 0) return false;
-
-        int j = 4;
-        while (order[i - 1] >= order[j]) j--;
-
-        int temp = order[i - 1];
-        order[i - 1] = order[j];
-        order[j] = temp;
-
-        j = 4;
-        while (i < j) {
-            temp = order[i];
-            order[i] = order[j];
-            order[j] = temp;
-            i++;
-            j--;
+    static void solve() {
+        for (int tmp = 0; tmp < 1024; tmp++) {
+            int brute = tmp;
+            for(int i=0; i<5; i++){
+                int dir = brute % 4;
+                brute /= 4;
+                for(int j=0; j<5; j++){
+                    for(int k=0; k<5; k++){
+                        maze[i][j][k] = board[dir][order[i]][j][k];
+                    }
+                }
+            }
+            mn = Math.min(mn, bfs());
         }
-        return true;
+
+
+    }
+
+    static void func(int k) {
+        if (k == 5) {
+            solve();
+            return;
+        }
+        for (int i = 0; i < 5; i++) {
+            if (picked[i])
+                continue;
+            picked[i] = true;
+            order[k] = i;
+            func(k + 1);
+            picked[i] = false;
+        }
     }
 
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
+        for (int k = 0; k < 5; k++) {
+            for (int i = 0; i < 5; i++) {
                 StringTokenizer st = new StringTokenizer(br.readLine());
-                for (int k = 0; k < 5; k++) {
-                    board[0][i][j][k] = Integer.parseInt(st.nextToken());
+                for (int j = 0; j < 5; j++) {
+                    board[0][k][i][j] = Integer.parseInt(st.nextToken());
                 }
             }
 
-            for (int j = 0; j < 5; j++) {
-                for (int k = 0; k < 5; k++) {
-                    board[1][i][j][k] = board[0][i][4 - k][j];
+            for (int i = 0; i < 5; i++) {
+                for (int j = 0; j < 5; j++) {
+                    board[1][k][i][j] = board[0][k][4 - j][i];
                 }
             }
 
-            for (int j = 0; j < 5; j++) {
-                for (int k = 0; k < 5; k++) {
-                    board[2][i][j][k] = board[1][i][4 - k][j];
+            for (int i = 0; i < 5; i++) {
+                for (int j = 0; j < 5; j++) {
+                    board[2][k][i][j] = board[1][k][4 - j][i];
                 }
             }
 
-            for (int j = 0; j < 5; j++) {
-                for (int k = 0; k < 5; k++) {
-                    board[3][i][j][k] = board[2][i][4 - k][j];
+            for (int i = 0; i < 5; i++) {
+                for (int j = 0; j < 5; j++) {
+                    board[3][k][i][j] = board[2][k][4 - j][i];
                 }
             }
         }
-
-        int[] order = {0, 1, 2, 3, 4};
-        int ans = 9999;
-
-        do {
-            for (int tmp = 0; tmp < 1024; tmp++) {
-                int brute = tmp;
-                for (int i = 0; i < 5; i++) {
-                    int dir = brute % 4;
-                    brute /= 4;
-                    for (int j = 0; j < 5; j++) {
-                        for (int k = 0; k < 5; k++) {
-                            maze[i][j][k] = board[dir][order[i]][j][k];
-                        }
-                    }
-                }
-                ans = Math.min(ans, solve());
-            }
-        } while (nextPermutation(order));
-
-        if (ans == 9999) ans = -1;
-        bw.write(ans + "\n");
+        func(0);
+        if(mn == 9999) bw.write("-1");
+        else bw.write(mn+"");
         bw.flush();
         bw.close();
     }
