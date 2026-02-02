@@ -14,6 +14,7 @@ public class Main {
         if(k == n-1){
             mn = Math.min(mn, num);
             mx = Math.max(mx, num);
+            return;
         }
         if(op[0] != 0){
             op[0]--;
